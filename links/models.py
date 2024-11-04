@@ -5,7 +5,7 @@ from django.utils.text import slugify
 
 
 class Link(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     url = models.URLField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     clicks = models.PositiveIntegerField(default=0)
@@ -22,5 +22,5 @@ class Link(models.Model):
         # check if someone created a slug when entering a link, if not we generate it using slugify
         if not self.slug:
             # slugify converts any spaces into dashes
-            self.slug = slugify()
-        super().save(*args, **kwargs)
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
