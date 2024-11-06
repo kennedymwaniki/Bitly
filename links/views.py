@@ -1,7 +1,40 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 # from .views import index
 # Create your views here.
+from django.urls import reverse
+
+from .forms import LinkForm
+from .models import Link
+from .models import Link
 
 
 def index(request):
-    return render(request, 'links/index.html', {})
+    links = Link.objects.all()
+    context = {
+        "links": links
+    }
+    return render(request, 'links/index.html', context)
+
+
+def root_link(request, link_slug):
+    link = get_object_or_404(Link, slug=link_slug)
+    link.click()
+
+    return redirect(link.url)
+
+
+def add_link(request):
+    if request.method == "POST":
+        form = LinkForm(request.POST)
+        if form.is_valid():
+            # if the form is valid - then process
+            form.save()
+            return redirect(reverse('home'))
+
+    else:
+        form = LinkForm()
+
+    context = {
+        "form": form
+    }
+    return render(request, 'links/create.html', context)
